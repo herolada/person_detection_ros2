@@ -18,6 +18,9 @@ def generate_launch_description():
                               description='Raw sensor_msgs/Image topic to detect on'),
         DeclareLaunchArgument('detections', default_value='/person_detection/detections'),
         DeclareLaunchArgument('debug_image', default_value='/person_detection/debug_image'),
+        DeclareLaunchArgument('model_path', default_value='yolox_tiny.onnx',
+                              description='.onnx -> OpenCV (CPU), .engine -> TensorRT (GPU); '
+                                          'bare file names are looked up in the models/ dir'),
         DeclareLaunchArgument('decompress', default_value='true',
                               description='Republish <image>/compressed as raw <image>'),
 
@@ -30,7 +33,7 @@ def generate_launch_description():
         ),
         Node(
             package='person_detection', executable='person_detector', name='person_detector',
-            parameters=[config],
+            parameters=[config, {'model_path': LaunchConfiguration('model_path')}],
             remappings=[('image', image),
                         ('detections', LaunchConfiguration('detections')),
                         ('debug_image', LaunchConfiguration('debug_image'))],
